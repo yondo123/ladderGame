@@ -31,9 +31,15 @@ body {
     height: 100%;
     overflow: hidden;
     background-color: #232323;
+    overflow: auto;
 }
 
 #setArea {
+    text-align: center;
+    margin: 0 auto;
+}
+
+#controllArea {
     text-align: center;
     margin: 0 auto;
 }
