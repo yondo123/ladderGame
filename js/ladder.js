@@ -1,13 +1,13 @@
 window.onload = () => {
     //전역변수 
-    let trunkArray = [];
+    let initLineArray = []; /* 라인 시작위치 배열 */
+    let trunkArray = []; /*간선 배열*/
+    let boxCount = 0; /* 박스 갯수 */
 
     //Element 변수
     const startButton = document.querySelector('#startButton');
     const canvas = document.getElementById('mainCanvas');
     const ladderCtx = canvas.getContext('2d');
-
-    //이벤트 지정
     const nextBtn = document.getElementById('nextButton');
     const prevBtn = document.getElementById('prevButton');
     const createBtn = document.getElementById('createButton');
@@ -28,7 +28,7 @@ window.onload = () => {
 
     //게임 생성
     createBtn.addEventListener('click', function() {
-        let boxCount = Number(document.getElementById('textArea').value);
+        boxCount = Number(document.getElementById('textArea').value);
         if (boxCount < 1) {
             startButton.disabled = true;
             alert('인원은 최소 1명 이상입니다!');
@@ -36,6 +36,11 @@ window.onload = () => {
             startButton.disabled = false;
             setRectCanvas(boxCount);
         }
+    });
+
+    //게임 시작
+    startButton.addEventListener('click', function() {
+        drawLines();
     });
 
     //사각형 크기 설정
@@ -54,17 +59,17 @@ window.onload = () => {
     function setRectCanvas(count) {
         resetCanvas();
         trunkArray = [];
-        const boxRgbLayor = 'rgb(136, 147, 166)'
+        const boxRgbLayor = 'rgb(136, 147, 166)';
         const boxSizeObj = getRectSize(canvas.width, count);
         const boxWidth = boxSizeObj.width;
         const boxHeight = boxSizeObj.height;
         let divideLine = 0;
-        let interval = 0;
         let canvasH = canvas.height;
         for (let i = 0; i < count; i++) {
-            if (i != 0 || i != count - 1) {
-                trunkArray.push(getRandomInt(0, 10));
-                console.log(trunkArray);
+            if (i > 0 && i < count) {
+                //getRandomInt 맥스값 : box아래 px, 최소값 아랫 박스 px;
+                trunkArray.push(getRandomInt(1, 5));
+                console.log('brunch Count>>' + trunkArray);
             }
             console.log('나눔선' + divideLine);
             console.log('너비 ' + boxSizeObj.width);
@@ -72,15 +77,33 @@ window.onload = () => {
             ladderCtx.fillRect(divideLine, 10, boxWidth, boxHeight);
             ladderCtx.fillStyle = boxRgbLayor;
             ladderCtx.fillRect(divideLine, canvasH - 10, boxWidth, boxHeight);
+            initLineArray.push(divideLine + boxWidth / 2);
             divideLine += canvas.width / count - 1;
-            interval = (divideLine - boxWidth) * 0.2;
         }
 
     }
-
     //박스 간 선 잇기
     function drawLines() {
-        //trunkArray 활용한다.
+        console.log('ladder Game Start!!');
+        for (let i = 0; i < initLineArray.length; i++) {
+            const centre = initLineArray[i];
+            let count = 0;
+            let startY = 15;
+            let finishY = canvas.height - 10;
+            ladderCtx.lineWidth = 0.5;
+            ladderCtx.moveTo(centre, startY);
+            ladderCtx.lineTo(centre, finishY);
+            //간선 잇기
+            for (let j = 0; j < trunkArray[i]; j++) {
+                const brunchY = getRandomInt(startY + 2, finishY - 2);
+                const brunchFinish = initLineArray[i + 1];
+                console.log(j + ' 번째 가짓수 : ' + trunkArray[j] + '위치 : ' + brunchY);
+                ladderCtx.moveTo(centre, brunchY);
+                ladderCtx.lineTo(brunchFinish, brunchY);
+            }
+            ladderCtx.strokeStyle = 'rgb(136, 147, 166)';
+            ladderCtx.stroke();
+        }
     }
 
     //캔버스 초기화
@@ -88,6 +111,9 @@ window.onload = () => {
         var ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
+        boxCount = 0;
+        trunkArray = [];
+        initLineArray = [];
     }
 
     //난수 생성 (사다리 간선)
