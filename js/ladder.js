@@ -11,6 +11,7 @@ window.onload = () => {
     const nextBtn = document.getElementById('nextButton');
     const prevBtn = document.getElementById('prevButton');
     const createBtn = document.getElementById('createButton');
+    const resultBtn = document.getElementById('resetButton');
 
     //인원 중가
     nextBtn.addEventListener('click', function() {
@@ -29,17 +30,18 @@ window.onload = () => {
     //게임 생성
     createBtn.addEventListener('click', function() {
         boxCount = Number(document.getElementById('textArea').value);
-        if (boxCount < 1) {
+        if (boxCount < 2) {
             startButton.disabled = true;
-            alert('인원은 최소 1명 이상입니다!');
+            alert('인원은 최소 2명 이상입니다!');
         } else {
-            startButton.disabled = false;
             setRectCanvas(boxCount);
         }
     });
 
     //게임 시작
     startButton.addEventListener('click', function() {
+        startButton.disabled = true;
+        resultBtn.disabled = false;
         drawLines();
     });
 
@@ -68,7 +70,7 @@ window.onload = () => {
         for (let i = 0; i < count; i++) {
             if (i > 0 && i < count) {
                 //getRandomInt 맥스값 : box아래 px, 최소값 아랫 박스 px;
-                trunkArray.push(getRandomInt(1, 5));
+                trunkArray.push(getRandomInt(1, 10));
                 console.log('brunch Count>>' + trunkArray);
             }
             console.log('나눔선' + divideLine);
@@ -87,17 +89,15 @@ window.onload = () => {
         console.log('ladder Game Start!!');
         for (let i = 0; i < initLineArray.length; i++) {
             const centre = initLineArray[i];
-            let count = 0;
             let startY = 15;
             let finishY = canvas.height - 10;
-            ladderCtx.lineWidth = 0.5;
+            ladderCtx.lineWidth = 3;
             ladderCtx.moveTo(centre, startY);
             ladderCtx.lineTo(centre, finishY);
             //간선 잇기
             for (let j = 0; j < trunkArray[i]; j++) {
                 const brunchY = getRandomInt(startY + 2, finishY - 2);
                 const brunchFinish = initLineArray[i + 1];
-                console.log(j + ' 번째 가짓수 : ' + trunkArray[j] + '위치 : ' + brunchY);
                 ladderCtx.moveTo(centre, brunchY);
                 ladderCtx.lineTo(brunchFinish, brunchY);
             }
@@ -108,6 +108,8 @@ window.onload = () => {
 
     //캔버스 초기화
     function resetCanvas() {
+        resultBtn.disabled = true;
+        startButton.disabled = false;
         var ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
@@ -116,7 +118,7 @@ window.onload = () => {
         initLineArray = [];
     }
 
-    //난수 생성 (사다리 간선)
+    //난수 생성
     function getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
